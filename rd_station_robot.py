@@ -4,7 +4,9 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+import json
 import re
+import requests
 import time
 import os
 
@@ -42,8 +44,43 @@ def upload_deal_files(deal, files=None):
     driver.close()
 
 
-def create_opportunity():
+def create_opportunity(name, email=None):
     api_token = os.getenv("RD_STATION_API_TOKEN")
+    user_id = os.getenv("RD_STATION_USER_ID")
+    deal_stage_id = os.getenv("RD_STATION_DEAL_STAGE_ID")
+    if not api_token or not user_id or not deal_stage_id:
+        print("Please set the environment variables RD_STATION_API_TOKEN, RD_STATION_USER_ID, RD_STATION_DEAL_STAGE_ID")
+        return
+    url = f"https://plugcrm.net/api/v1/deals?token={api_token}"
+    data = {
+        'deal': {
+            'name': name,
+            'user_id': user_id,
+            'deal_stage_id': deal_stage_id
+        },
+        'contacts': [
+            {
+                'name': name,
+                'emails': [
+                    {
+                        'email': email
+                    }
+                ],
+                'phones': [
+                    {
+                        'phone': '1199999999'
+                    }
+                ]
+            }
+        ],
+        'organization': {
+            'name': name
+        }
+    }
+    res = requests.post(url, json=data)
+    res.raise_for_status()
+    res_obj = json.loads(res.text)
+    return res_obj["id"]
 
 
 if __name__ == "__main__":
