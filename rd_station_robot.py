@@ -12,6 +12,8 @@ import os
 def upload_deal_files(deal, files=None):
     options = Options()
     options.headless = True
+    options.add_argument("--window-size=1920,1080")
+    options.add_argument("--start-maximized")
     driver = webdriver.Chrome(options=options)
     wait = WebDriverWait(driver, 10)
     #driver.implicitly_wait(10) # usar espera implicita em todos os comandos
@@ -28,9 +30,11 @@ def upload_deal_files(deal, files=None):
     if driver.find_elements(*dialog_close_button_By):
         driver.find_element(*dialog_close_button_By).click()
     
-    time.sleep(1)
-    aba_arquivos = wait.until(EC.visibility_of_element_located((By.CSS_SELECTOR, "md-tab-item:nth-child(6)")))
-    aba_arquivos.click()
+    time.sleep(10)
+
+    driver.find_element(By.CSS_SELECTOR, "md-tab-item:nth-child(6)").click()
+    # aba_arquivos = wait.until(EC.visibility_of_element_located((By.CSS_SELECTOR, "md-tab-item:nth-child(6)")))
+    # aba_arquivos.click()
     
     driver.find_element(By.CSS_SELECTOR, "#upload-file-input > input[type=file]").send_keys("\n".join(files))
     wait.until(lambda d: "Uploading..." not in driver.find_element(By.CSS_SELECTOR, "#deal_container table").text)
@@ -44,6 +48,6 @@ def create_opportunity():
 
 if __name__ == "__main__":
     upload_deal_files("6254368e507374000f9fac61", [
-        "C:/Users/paulo.pivotto/Documents/Python/pipefy-integration/rd_station_robot.py",
-        "C:/Users/paulo.pivotto/Pictures/Robots-Square-300x300.jpg"])
+        "C:/Users/high/Documents/git/pipefy-integration/rd_station_robot.py",
+        "C:/Users/high/Documents/GD/stc3D/fonts/Montserrat-Medium.ttf"])
     print("end of test")
